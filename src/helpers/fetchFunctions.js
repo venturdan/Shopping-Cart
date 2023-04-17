@@ -25,10 +25,6 @@ export const fetchProductsList = async (searchTerm) => {
 
   const response = await fetch(endpoint);
 
-  if (!response.ok) {
-    throw new Error('Erro ao buscar produtos');
-  }
-
   const data = await response.json();
 
   return data.results;

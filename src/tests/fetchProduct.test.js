@@ -2,38 +2,32 @@ import './mocks/fetchSimulator';
 import { fetchProduct } from '../helpers/fetchFunctions';
 import product from './mocks/product';
 
-describe('Teste a função fetchProduct', () => {
-  it('fetchProduct deve ser uma função', () => {
+describe('fetchProduct', () => {
+  test('é uma função', () => {
     expect(typeof fetchProduct).toBe('function');
   });
 
-  it('fetchProduct deve chamar a função fetch com o endpoint correto', async () => {
-    global.fetch = jest.fn(() => Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(product),
-    }));
-
+  test('chama a função fetch com o endpoint correto', async () => {
+    global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(product) }));
     const id = 'MLB1405519561';
-    const endpoint = `https://api.mercadolibre.com/items/${id}`;
-
     await fetchProduct(id);
-
-    expect(global.fetch).toHaveBeenCalledWith(endpoint);
+    expect(global.fetch).toHaveBeenCalledWith(`https://api.mercadolibre.com/items/${id}`);
   });
 
-  it('fetchProduct deve retornar uma estrutura de dados igual ao objeto product', async () => {
-    global.fetch = jest.fn(() => Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve(product),
-    }));
-
+  test('retorna o objeto produto correto', async () => {
+    global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(product) }));
     const id = 'MLB1405519561';
     const result = await fetchProduct(id);
-
     expect(result).toEqual(product);
   });
 
-  it('fetchProduct deve lançar um erro quando não recebe o argumento "id"', async () => {
-    await expect(fetchProduct()).rejects.toThrowError('ID não informado');
+  test('lança um erro quando o id não é informado', async () => {
+    await expect(fetchProduct()).rejects.toThrow('ID não informado');
+  });
+
+  test('lança um erro quando a busca falha', async () => {
+    global.fetch = jest.fn(() => Promise.resolve({ ok: false }));
+    const id = 'MLB1405519561';
+    await expect(fetchProduct(id)).rejects.toThrow('Erro ao buscar produto');
   });
 });

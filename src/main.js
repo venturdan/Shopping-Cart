@@ -2,8 +2,10 @@ import './style.css';
 import { fetchProduct, fetchProductsList } from './helpers/fetchFunctions';
 import { createCartProductElement, createProductElement } from './helpers/shopFunctions';
 import { getSavedCartIDs } from './helpers/cartFunctions';
+import { searchCep } from './helpers/cepFunctions';
 
 const productsSection = document.querySelector('.products');
+document.querySelector('.cep-button').addEventListener('click', searchCep);
 
 const listarProdutos = async () => {
   const listaDeProdutos = await fetchProductsList('computador');
@@ -40,9 +42,17 @@ const recuperarCarrinho = async () => {
     const arrayPromises = idsSalvos.map(async (idSalvo) => fetchProduct(idSalvo));
     const arrayProdutos = await Promise.all(arrayPromises);
     arrayProdutos.forEach((item) => {
-      const novoProduto = createCartProductElement(item);
-      document.querySelector('.cart__products').appendChild(novoProduto);
+      const cartProducts = createCartProductElement(item);
+      document.querySelector('.cart__products').appendChild(cartProducts);
     });
   }
 };
 recuperarCarrinho();
+
+const valorCarrinho = () => {
+  if (localStorage.getItem('cartTotal') !== null) {
+    const total = document.querySelector('.total-price');
+    total.innerHTML = JSON.parse(localStorage.getItem('cartTotal'));
+  }
+};
+valorCarrinho();

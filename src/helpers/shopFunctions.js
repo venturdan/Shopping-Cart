@@ -1,4 +1,5 @@
-import { removeCartID } from './cartFunctions';
+import { removeCartID, saveCartID } from './cartFunctions';
+import { fetchProduct } from './fetchFunctions';
 
 // Esses comentários que estão antes de cada uma das funções são chamados de JSdoc,
 // experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições!
@@ -87,7 +88,12 @@ export const createCartProductElement = ({ id, title, price, pictures }) => {
   );
   li.appendChild(removeButton);
 
-  li.addEventListener('click', () => removeCartProduct(li, id));
+  li.addEventListener('click', () => {
+    const total = document.querySelector('.total-price');
+    total.innerHTML = (Number(total.innerHTML) - Number(price)).toFixed(2);
+    removeCartProduct(li, id);
+    localStorage.setItem('cartTotal', JSON.stringify(total.innerHTML));
+  });
   return li;
 };
 
@@ -124,10 +130,21 @@ export const createProductElement = ({ id, title, thumbnail, price }) => {
   section.appendChild(cartButton);
 
   cartButton.addEventListener('click', async () => {
-    const produto = await fetchProduct(id);
-    saveCartItem(id);
-    const newproduto = createCartItemElement(produto);
-    document.querySelector('.cart__products').appendChild(newproduto);
+    try {
+      const product = await fetchProduct(id);
+      saveCartID(id);
+      const cartProduct = createCartProductElement(product);
+      const cartProducts = document.querySelector('.cart__products');
+      cartProducts.appendChild(cartProduct);
+
+      const totalPrice = document.querySelector('.total-price');
+      const currentTotal = Number(totalPrice.innerHTML);
+      const newTotal = (currentTotal + price).toFixed(2);
+      totalPrice.innerHTML = newTotal;
+      localStorage.setItem('cartTotal', JSON.stringify(newTotal));
+    } catch (error) {
+      console.error('Erro ao adicionar produto ao carrinho:', error);
+    }
   });
 
   return section;
