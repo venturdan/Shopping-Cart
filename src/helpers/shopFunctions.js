@@ -123,5 +123,12 @@ export const createProductElement = ({ id, title, thumbnail, price }) => {
   );
   section.appendChild(cartButton);
 
+  cartButton.addEventListener('click', async () => {
+    const produto = await fetchProduct(id);
+    saveCartItem(id);
+    const newproduto = createCartItemElement(produto);
+    document.querySelector('.cart__products').appendChild(newproduto);
+  });
+
   return section;
 };

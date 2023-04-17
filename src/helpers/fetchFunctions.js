@@ -1,44 +1,35 @@
-function mostrarCarregando() {
-  const loadingElement = document.createElement('div');
-  loadingElement.classList.add('loading');
-  loadingElement.textContent = 'Carregando...';
-  document.body.appendChild(loadingElement);
-}
-
-function esconderCarregando() {
-  const loadingElement = document.querySelector('.loading');
-  if (loadingElement) {
-    document.body.removeChild(loadingElement);
-  }
-}
-
-export async function fetchProduct(productId) {
-  if (!productId) {
+export const fetchProduct = async (id) => {
+  if (!id) {
     throw new Error('ID não informado');
   }
 
-  try {
-    mostrarCarregando();
+  const endpoint = `https://api.mercadolibre.com/items/${id}`;
 
-    const response = await fetch(`https://api.mercadolibre.com/items/${productId}`);
-    const data = await response.json();
+  const response = await fetch(endpoint);
 
-    esconderCarregando();
-    hideError();
-
-    return data;
-  } catch (error) {
-    hideLoading();
-    showError('Algum erro ocorreu, recarregue a página e tente novamente');
-    throw error;
+  if (!response.ok) {
+    throw new Error('Erro ao buscar produto');
   }
-}
+
+  const data = await response.json();
+
+  return data;
+};
+
 export const fetchProductsList = async (searchTerm) => {
   if (!searchTerm) {
     throw new Error('Termo de busca não informado');
   }
 
-  const response = await fetch(`https://api.mercadolibre.com/sites/MLB/search?q=${searchTerm}`);
+  const endpoint = `https://api.mercadolibre.com/sites/MLB/search?q=${searchTerm}`;
+
+  const response = await fetch(endpoint);
+
+  if (!response.ok) {
+    throw new Error('Erro ao buscar produtos');
+  }
+
   const data = await response.json();
+
   return data.results;
 };
